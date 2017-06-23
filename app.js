@@ -2,7 +2,7 @@
  * @Author: Alan
  * @Date:   2017-06-22 18:00:50
  * @Last Modified by:  Alan
- * @Last Modified time: 2017-06-23 14:56:48
+ * @Last Modified time: 2017-06-23 15:47:43
  */
 
 'use strict';
@@ -29,65 +29,64 @@ app.use(Express.static(__dirname + '/public'))
 // })
 // 
 
-// chatroom
-let usersNum = 0
+// Chatroom
 
-// when the client connected, this works
-io.on('connection', (socket) => {
-	let addedUser = false
+var numUsers = 0;
 
-	// when the client emits 'chat-message', this listens and executes
-	socket.on('chat-message', (msg) => {
-		// tell the client to excute 'chat-message'
-		socket.broadcast.emit('chat-message', {
-			usename: socket.username,
-			message: msg
-		})
-	})
+io.on('connection', function (socket) {
+  var addedUser = false;
 
-	// when the client emits 'add-user', this listens and executes
-	socket.on('add-user', (username) => {
-		// forbid to add the same user which is already connecting repetly
-		if (addedUser) return 
+  // when the client emits 'new message', this listens and executes
+  socket.on('new message', function (data) {
+    // we tell the client to execute 'new message'
+    socket.broadcast.emit('new message', {
+      username: socket.username,
+      message: data
+    });
+  });
 
-		// store the username in the socket session for this client
-		socket.username = username
-		++usersNum
-		addedUser = true
-		socket.emit('login', {usersNum: usersNum})
+  // when the client emits 'add user', this listens and executes
+  socket.on('add user', function (username) {
+    if (addedUser) return;
 
-		// echo globally (all clients) that a user has connected
-		socket.broadcast.emit('user-joined', {
-			username: socket.username,
-			usersNum: usersNum
-		})
-	})
+    // we store the username in the socket session for this client
+    socket.username = username;
+    ++numUsers;
+    addedUser = true;
+    socket.emit('login', {
+      numUsers: numUsers
+    });
+    // echo globally (all clients) that a person has connected
+    socket.broadcast.emit('user joined', {
+      username: socket.username,
+      numUsers: numUsers
+    });
+  });
 
-	// when the client emits 'typing', broadcast it to others
-	socket.on('typing', () => {
-		socket.broadcast.emit('typing', {
-			username: socket.username
-		})
-	})
+  // when the client emits 'typing', we broadcast it to others
+  socket.on('typing', function () {
+    socket.broadcast.emit('typing', {
+      username: socket.username
+    });
+  });
 
-	// when the client emits 'stopp-typing', broadcast it to others
-	socket.on('stop-typing', () => {
-		socket.broadcast.emit('typing', {
-			username: socket.username
-		})
-	}) 
+  // when the client emits 'stop typing', we broadcast it to others
+  socket.on('stop typing', function () {
+    socket.broadcast.emit('stop typing', {
+      username: socket.username
+    });
+  });
 
-	// when the user disconnects, perform this
-	socket.on('disconnect', () => {
-		if (addedUser) {
-			--usersNum
+  // when the user disconnects.. perform this
+  socket.on('disconnect', function () {
+    if (addedUser) {
+      --numUsers;
 
-			// echo globally that this client has left
-			socket.broadcast.emit('user-left', {
-				username: socket.username,
-				usersNum: usersNum
-			})
-		}
-	})
-})
-
+      // echo globally that this client has left
+      socket.broadcast.emit('user left', {
+        username: socket.username,
+        numUsers: numUsers
+      });
+    }
+  });
+});
