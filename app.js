@@ -2,7 +2,7 @@
  * @Author: Alan
  * @Date:   2017-06-22 18:00:50
  * @Last Modified by:  Alan
- * @Last Modified time: 2017-06-23 11:23:11
+ * @Last Modified time: 2017-06-23 11:39:22
  */
 
 'use strict';
@@ -18,10 +18,15 @@ app.get('/', (req, res) => {
 })
 
 io.on('connection', (socket) => {
-	console.log('a user connected')
-	socket.on('disconnect', (socket) => {
-		console.log('user disconnected')
+	// console.log('a user connected')
+
+	socket.on('chat-message', (msg) => {
+		console.log('message:' + msg)
 	})
+
+	// socket.on('disconnect', (socket) => {
+	// 	console.log('user disconnected')
+	// })
 })
 
 http.listen(1234, () => {

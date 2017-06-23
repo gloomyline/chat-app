@@ -60,8 +60,14 @@
   </form>
 
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
   <script type="text/javascript">
   	var socket = io()
+  	$('form').submit(function(){
+  		socket.emit('chat-message', $('#m').val())
+  		$('#m').val('')
+  		return false // 阻止表单提交页面跳转
+  	})
   </script>
 </body>
 
