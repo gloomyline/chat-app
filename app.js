@@ -2,7 +2,7 @@
  * @Author: Alan
  * @Date:   2017-06-22 18:00:50
  * @Last Modified by:  Alan
- * @Last Modified time: 2017-06-23 11:39:22
+ * @Last Modified time: 2017-06-23 11:47:38
  */
 
 'use strict';
@@ -21,7 +21,8 @@ io.on('connection', (socket) => {
 	// console.log('a user connected')
 
 	socket.on('chat-message', (msg) => {
-		console.log('message:' + msg)
+		// console.log('message:' + msg)
+		io.emit('chat-message', msg) // send the message to the sender 
 	})
 
 	// socket.on('disconnect', (socket) => {
